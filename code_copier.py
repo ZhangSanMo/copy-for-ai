@@ -2,7 +2,7 @@ import sys
 import os
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QTreeWidget, QTreeWidgetItem, QVBoxLayout, 
                              QWidget, QPushButton, QLabel, QMessageBox, QProgressBar, 
-                             QHBoxLayout, QFileDialog, QLineEdit, QHeaderView)
+                             QHBoxLayout, QFileDialog, QLineEdit, QHeaderView, QSizeGrip, QFrame)
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtGui import QIcon, QFileSystemModel
 
@@ -12,6 +12,318 @@ IGNORE_DIRS = {'.git', '.svn', '.hg', '.idea', '.vscode', '__pycache__', 'node_m
 IGNORE_EXTS = {'.exe', '.dll', '.so', '.dylib', '.class', '.jar', '.pyc', '.pyo', 
                '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.ico', '.pdf', '.zip', '.tar', '.gz', '.7z', '.rar',
                '.svg', '.woff', '.woff2', '.ttf', '.eot', '.mp4', '.mp3', '.wav'}
+
+# Theme Definitions
+DARK_THEME = """
+QWidget {
+    background-color: #2b2b2b;
+    color: #e0e0e0;
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    font-size: 10pt;
+}
+#RootWidget {
+    border: 1px solid #3e3e3e;
+    background-color: #2b2b2b;
+}
+QLineEdit {
+    background-color: #383838;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 5px;
+    selection-background-color: #0078d4;
+    color: #e0e0e0;
+}
+QTreeWidget {
+    background-color: #323232;
+    border: 1px solid #444;
+    border-radius: 4px;
+    alternate-background-color: #383838;
+}
+QTreeWidget::item {
+    padding: 4px;
+}
+QTreeWidget::item:hover {
+    background-color: #3e3e3e;
+}
+QTreeWidget::item:selected {
+    background-color: #4d4d4d;
+    color: #ffffff;
+}
+QHeaderView::section {
+    background-color: #404040;
+    color: #ddd;
+    padding: 4px;
+    border: none;
+    border-bottom: 1px solid #555;
+}
+QPushButton {
+    background-color: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 12px;
+}
+QPushButton:hover {
+    background-color: #1084d9;
+}
+QPushButton:pressed {
+    background-color: #006cc1;
+}
+QPushButton:disabled {
+    background-color: #444;
+    color: #888;
+}
+QProgressBar {
+    border: 1px solid #444;
+    border-radius: 4px;
+    text-align: center;
+    background-color: #333;
+}
+QProgressBar::chunk {
+    background-color: #0078d4;
+    border-radius: 3px;
+}
+QScrollBar:vertical {
+    border: none;
+    background: #2b2b2b;
+    width: 10px;
+    margin: 0px;
+}
+QScrollBar::handle:vertical {
+    background: #555;
+    min-height: 20px;
+    border-radius: 5px;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+/* Title Bar - Seamless Integration */
+#TitleBar {
+    background-color: transparent;
+}
+#TitleLabel {
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 11pt;
+}
+.TitleBtn {
+    background-color: transparent;
+    color: #e0e0e0;
+    border: none;
+    border-radius: 4px;
+    padding: 0;
+    font-size: 11px;
+    margin-left: 2px;
+}
+.TitleBtn:hover {
+    background-color: #444;
+}
+#ThemeBtn {
+    font-size: 13px;
+    font-weight: normal;
+}
+#CloseBtn:hover {
+    background-color: #d32f2f;
+    color: white;
+}
+"""
+
+LIGHT_THEME = """
+QWidget {
+    background-color: #f9f9f9;
+    color: #333333;
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    font-size: 10pt;
+}
+#RootWidget {
+    border: 1px solid #dcdcdc;
+    background-color: #f9f9f9;
+}
+QLineEdit {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    padding: 5px;
+    selection-background-color: #0078d4;
+    color: #333333;
+}
+QTreeWidget {
+    background-color: #ffffff;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    alternate-background-color: #fcfcfc;
+}
+QTreeWidget::item {
+    padding: 4px;
+    color: #333;
+}
+QTreeWidget::item:hover {
+    background-color: #e6f7ff;
+}
+QTreeWidget::item:selected {
+    background-color: #cce8ff;
+    color: #000;
+}
+QHeaderView::section {
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 4px;
+    border: none;
+    border-bottom: 1px solid #ccc;
+}
+QPushButton {
+    background-color: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 12px;
+}
+QPushButton:hover {
+    background-color: #1084d9;
+}
+QPushButton:pressed {
+    background-color: #006cc1;
+}
+QPushButton:disabled {
+    background-color: #cccccc;
+    color: #666666;
+}
+QProgressBar {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+    background-color: #eee;
+}
+QProgressBar::chunk {
+    background-color: #0078d4;
+    border-radius: 3px;
+}
+QScrollBar:vertical {
+    border: none;
+    background: #f9f9f9;
+    width: 10px;
+    margin: 0px;
+}
+QScrollBar::handle:vertical {
+    background: #c1c1c1;
+    min-height: 20px;
+    border-radius: 5px;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+/* Title Bar - Seamless Integration */
+#TitleBar {
+    background-color: transparent;
+}
+#TitleLabel {
+    color: #000000;
+    font-weight: bold;
+    font-size: 11pt;
+}
+.TitleBtn {
+    background-color: transparent;
+    color: #333;
+    border: none;
+    border-radius: 4px;
+    padding: 0;
+    font-size: 11px;
+    margin-left: 2px;
+}
+.TitleBtn:hover {
+    background-color: #e0e0e0;
+}
+#ThemeBtn {
+    font-size: 13px;
+    font-weight: normal;
+}
+#CloseBtn:hover {
+    background-color: #e81123;
+    color: white;
+}
+"""
+
+class ThemeManager:
+    def __init__(self, app):
+        self.app = app
+        self.is_dark = True
+    
+    def toggle_theme(self):
+        self.is_dark = not self.is_dark
+        self.apply_theme()
+        return self.is_dark
+        
+    def apply_theme(self):
+        if self.is_dark:
+            self.app.setStyleSheet(DARK_THEME)
+        else:
+            self.app.setStyleSheet(LIGHT_THEME)
+
+class TitleBar(QFrame):
+    def __init__(self, parent_window, theme_manager):
+        super().__init__()
+        self.parent_window = parent_window
+        self.theme_manager = theme_manager
+        self.setObjectName("TitleBar")
+        self.setFixedHeight(40)
+        
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(20, 0, 20, 0) # Symmetric alignment
+        layout.setSpacing(0)
+        
+        # Title
+        self.title_label = QLabel("Code Context Extractor")
+        self.title_label.setObjectName("TitleLabel")
+        layout.addWidget(self.title_label)
+        
+        layout.addStretch()
+        
+        # Theme Toggle
+        self.btn_theme = QPushButton("☀/🌙")
+        self.btn_theme.setObjectName("ThemeBtn") # Specific ID for styling
+        self.btn_theme.setProperty("class", "TitleBtn")
+        self.btn_theme.setFixedSize(60, 36) # Wider to avoid truncation
+        self.btn_theme.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_theme.setToolTip("Toggle Theme")
+        self.btn_theme.clicked.connect(self.toggle_theme)
+        layout.addWidget(self.btn_theme)
+
+        # Minimize
+        self.btn_min = QPushButton("─")
+        self.btn_min.setProperty("class", "TitleBtn")
+        self.btn_min.setFixedSize(36, 36)
+        self.btn_min.clicked.connect(self.parent_window.showMinimized)
+        layout.addWidget(self.btn_min)
+
+        # Maximize/Restore
+        self.btn_max = QPushButton("☐")
+        self.btn_max.setProperty("class", "TitleBtn")
+        self.btn_max.setFixedSize(36, 36)
+        self.btn_max.clicked.connect(self.toggle_max_restore)
+        layout.addWidget(self.btn_max)
+
+        # Close
+        self.btn_close = QPushButton("✕")
+        self.btn_close.setProperty("class", "TitleBtn")
+        self.btn_close.setObjectName("CloseBtn") # Specific ID for red hover
+        self.btn_close.setFixedSize(36, 36)
+        self.btn_close.clicked.connect(self.parent_window.close)
+        layout.addWidget(self.btn_close)
+
+    def toggle_theme(self):
+        self.theme_manager.toggle_theme()
+
+    def toggle_max_restore(self):
+        if self.parent_window.isMaximized():
+            self.parent_window.showNormal()
+            self.btn_max.setText("☐")
+        else:
+            self.parent_window.showMaximized()
+            self.btn_max.setText("❐")
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.parent_window.windowHandle().startSystemMove()
 
 class Worker(QThread):
     progress = pyqtSignal(int)
@@ -119,59 +431,98 @@ class FileTreeItem(QTreeWidgetItem):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("AI 代码上下文提取工具")
-        self.resize(800, 600)
+        self.setWindowTitle("Code Context Extractor for AI")
+        self.resize(900, 700)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         
-        main_widget = QWidget()
-        self.setCentralWidget(main_widget)
-        layout = QVBoxLayout(main_widget)
+        # Theme Init
+        self.theme_manager = ThemeManager(QApplication.instance())
+        self.theme_manager.apply_theme()
+        
+        # Root Widget & Layout (Contains TitleBar + Content)
+        root_widget = QWidget()
+        root_widget.setObjectName("RootWidget") # Can be used for border
+        self.setCentralWidget(root_widget)
+        root_layout = QVBoxLayout(root_widget)
+        root_layout.setContentsMargins(0, 0, 0, 0)
+        root_layout.setSpacing(0)
 
-        # 1. 顶部选择区域
+        # 1. Title Bar
+        self.title_bar = TitleBar(self, self.theme_manager)
+        root_layout.addWidget(self.title_bar)
+
+        # 2. Content Widget
+        content_widget = QWidget()
+        root_layout.addWidget(content_widget)
+        
+        # Layout for content
+        layout = QVBoxLayout(content_widget)
+        layout.setContentsMargins(20, 10, 20, 10) # Symmetric alignment with TitleBar
+        layout.setSpacing(15)
+
+        # --- Content UI ---
+        # 1. Top Selection Area
         top_layout = QHBoxLayout()
+        top_layout.setSpacing(10)
+        
         self.path_edit = QLineEdit()
-        self.path_edit.setPlaceholderText("请选择项目根目录...")
+        self.path_edit.setPlaceholderText("Select project root directory...")
         self.path_edit.setReadOnly(True)
+        self.path_edit.setMinimumHeight(35)
         top_layout.addWidget(self.path_edit)
 
-        self.btn_browse = QPushButton("选择目录")
+        self.btn_browse = QPushButton("Browse")
+        self.btn_browse.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_browse.setMinimumHeight(35)
         self.btn_browse.clicked.connect(self.browse_directory)
         top_layout.addWidget(self.btn_browse)
         layout.addLayout(top_layout)
 
-        # 2. 中间文件树
+        # 2. File Tree
         self.tree = QTreeWidget()
-        self.tree.setHeaderLabel("文件结构")
+        self.tree.setHeaderLabel("Project Structure")
         self.tree.itemExpanded.connect(self.on_item_expanded)
         self.tree.itemChanged.connect(self.on_item_changed)
         layout.addWidget(self.tree)
 
-        # 3. 底部操作区
-        self.btn_copy = QPushButton("生成并复制到剪贴板")
-        self.btn_copy.setMinimumHeight(50)
-        self.btn_copy.setStyleSheet("font-weight: bold; font-size: 14px;")
+        # 3. Bottom Operations
+        self.btn_copy = QPushButton("Generate & Copy to Clipboard")
+        self.btn_copy.setMinimumHeight(45)
+        self.btn_copy.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_copy.clicked.connect(self.start_processing)
-        self.btn_copy.setEnabled(False) # 未选择目录前不可用
+        self.btn_copy.setEnabled(False)
         layout.addWidget(self.btn_copy)
 
         self.progress_bar = QProgressBar()
         self.progress_bar.setVisible(False)
+        self.progress_bar.setTextVisible(False)
         layout.addWidget(self.progress_bar)
         
-        self.status_label = QLabel("请先选择项目根目录")
-        layout.addWidget(self.status_label)
+        # Status Label & SizeGrip Container
+        status_layout = QHBoxLayout()
+        self.status_label = QLabel("Please select a project root directory to start.")
+        self.status_label.setStyleSheet("color: #888; font-style: italic;")
+        self.status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        status_layout.addWidget(self.status_label, 1) # Stretch
+        
+        # Size Grip
+        self.size_grip = QSizeGrip(self)
+        status_layout.addWidget(self.size_grip, 0, Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
+        
+        layout.addLayout(status_layout)
 
         self.worker = None
         self.root_path = ""
-        self._updating_checks = False # 防止递归触发信号
+        self._updating_checks = False
 
     def browse_directory(self):
-        dir_path = QFileDialog.getExistingDirectory(self, "选择项目根目录")
+        dir_path = QFileDialog.getExistingDirectory(self, "Select Project Root")
         if dir_path:
             self.root_path = dir_path
             self.path_edit.setText(dir_path)
             self.load_root_tree(dir_path)
             self.btn_copy.setEnabled(True)
-            self.status_label.setText(f"已加载: {dir_path}")
+            self.status_label.setText(f"Loaded: {dir_path}")
 
     def load_root_tree(self, root_path):
         self.tree.clear()
@@ -296,16 +647,16 @@ class MainWindow(QMainWindow):
         self.collect_checked_paths(root, selected_items)
         
         if not selected_items:
-            QMessageBox.warning(self, "提示", "请先在左侧勾选需要复制的文件或文件夹！")
+            QMessageBox.warning(self, "Warning", "Please select files or folders from the tree first.")
             return
 
         self.btn_copy.setEnabled(False)
         self.progress_bar.setVisible(True)
         self.progress_bar.setRange(0, 0) # Indeterminate
-        self.status_label.setText("正在读取并解码文件...")
+        self.status_label.setText("Reading and decoding files...")
         
         self.worker = Worker(self.root_path, selected_items)
-        self.worker.progress.connect(lambda c: self.status_label.setText(f"已处理 {c} 个文件..."))
+        self.worker.progress.connect(lambda c: self.status_label.setText(f"Processed {c} files..."))
         self.worker.finished.connect(self.process_finished)
         self.worker.start()
 
@@ -335,11 +686,12 @@ class MainWindow(QMainWindow):
         
         self.btn_copy.setEnabled(True)
         self.progress_bar.setVisible(False)
-        self.status_label.setText(f"处理完成！共复制 {count} 个文件。")
-        QMessageBox.information(self, "成功", f"成功提取 {count} 个文件的内容并复制到剪贴板！\n可直接粘贴使用。")
+        self.status_label.setText(f"Done! Copied {count} files.")
+        QMessageBox.information(self, "Success", f"Successfully extracted {count} files to clipboard!\nReady to paste.")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
