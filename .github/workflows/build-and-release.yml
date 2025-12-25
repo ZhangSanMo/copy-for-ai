@@ -30,7 +30,7 @@ jobs:
 
     - name: Build Executable
       run: |
-        python -m nuitka --standalone --onefile --enable-plugin=pyside6 --disable-console --disable-cache=all --output-filename=CodeContextExtractor.exe code_copier.py
+        python -m nuitka --standalone --onefile --enable-plugin=pyside6 --disable-console --disable-cache=all --accept-downloads --output-filename=CodeContextExtractor.exe code_copier.py
 
     - name: Release
       uses: softprops/action-gh-release@v1
