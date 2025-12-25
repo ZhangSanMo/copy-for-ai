@@ -1,10 +1,11 @@
 import sys
 import os
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QTreeWidget, QTreeWidgetItem, QVBoxLayout, 
+from PySide6.QtWidgets import (QApplication, QMainWindow, QTreeWidget, QTreeWidgetItem, QVBoxLayout, 
                              QWidget, QPushButton, QLabel, QMessageBox, QProgressBar, 
-                             QHBoxLayout, QFileDialog, QLineEdit, QHeaderView, QSizeGrip, QFrame)
-from PyQt6.QtCore import Qt, QThread, pyqtSignal
-from PyQt6.QtGui import QIcon, QFileSystemModel
+                             QHBoxLayout, QFileDialog, QLineEdit, QHeaderView, QSizeGrip, QFrame,
+                             QFileSystemModel)
+from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtGui import QIcon
 
 # 配置：忽略的目录和文件后缀
 IGNORE_DIRS = {'.git', '.svn', '.hg', '.idea', '.vscode', '__pycache__', 'node_modules', 
@@ -326,8 +327,8 @@ class TitleBar(QFrame):
             self.parent_window.windowHandle().startSystemMove()
 
 class Worker(QThread):
-    progress = pyqtSignal(int)
-    finished = pyqtSignal(str, int)  # result_text, file_count
+    progress = Signal(int)
+    finished = Signal(str, int)  # result_text, file_count
     
     def __init__(self, root_dir, selected_paths):
         """
